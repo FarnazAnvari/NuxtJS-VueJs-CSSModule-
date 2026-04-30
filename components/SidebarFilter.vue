@@ -30,7 +30,13 @@
         <span class="divider"></span>
 
         <div class="input-wrapper">
-          <input v-model="search" type="text" placeholder="دو لنگه" />
+          <input
+            v-model="search"
+            type="text"
+            name="search"
+            id="search"
+            placeholder="دو لنگه"
+          />
 
           <button v-if="search" class="clear-btn" @click="search = ''">
             <svg viewBox="0 0 24 24" width="14" height="14">
@@ -54,7 +60,7 @@
       <span>درب‌های موجود</span>
 
       <label class="switch">
-        <input type="checkbox" v-model="availableOnly" />
+        <input type="checkbox" name="availableOnly" v-model="availableOnly" />
         <span class="slider"></span>
       </label>
     </div>
@@ -85,25 +91,25 @@
       <transition name="accordion">
         <div v-show="sortOpen">
           <label class="radio-item">
-            <input type="radio" value="low" v-model="sort" />
+            <input type="radio" name="sort" value="low" v-model="sort" />
             <span class="custom-radio"></span>
             تعداد: کم به زیاد
           </label>
 
           <label class="radio-item">
-            <input type="radio" value="high" v-model="sort" />
+            <input type="radio" name="sort" value="high" v-model="sort" />
             <span class="custom-radio"></span>
             تعداد: زیاد به کم
           </label>
 
           <label class="radio-item">
-            <input type="radio" value="rankHigh" v-model="sort" />
+            <input type="radio" name="sort" value="rankHigh" v-model="sort" />
             <span class="custom-radio"></span>
             رتبه: زیاد به کم
           </label>
 
           <label class="radio-item">
-            <input type="radio" value="rankLow" v-model="sort" />
+            <input type="radio" name="sort" value="rankLow" v-model="sort" />
             <span class="custom-radio"></span>
             رتبه: کم به زیاد
           </label>
@@ -138,7 +144,12 @@
         <div v-show="categoryOpen">
           <label class="checkbox-item">
             <div class="right">
-              <input type="checkbox" value="house" v-model="category" />
+              <input
+                type="checkbox"
+                name="category"
+                value="house"
+                v-model="category"
+              />
 
               <span class="custom-checkbox"></span>
 
@@ -155,7 +166,12 @@
 
           <label class="checkbox-item">
             <div class="right">
-              <input type="checkbox" value="health" v-model="category" />
+              <input
+                type="checkbox"
+                name="category"
+                value="health"
+                v-model="category"
+              />
 
               <span class="custom-checkbox"></span>
 
@@ -172,7 +188,12 @@
 
           <label class="checkbox-item">
             <div class="right">
-              <input type="checkbox" value="industry" v-model="category" />
+              <input
+                type="checkbox"
+                name="category"
+                value="industry"
+                v-model="category"
+              />
 
               <span class="custom-checkbox"></span>
 
