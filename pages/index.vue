@@ -1,19 +1,20 @@
 <template>
   <div class="page">
-    <!-- Header -->
     <Header />
 
-    <!-- Main -->
     <div class="container">
       <div class="layout">
-        <!-- Sidebar -->
+        <!-- sidebar -->
         <aside class="sidebar">
-          <SidebarFilter />
+          <SidebarFilter
+            v-model:search="search"
+            v-model:sort="sort"
+            v-model:category="category"
+          />
         </aside>
 
-        <!-- Content -->
+        <!-- content -->
         <main class="content">
-          <!-- Topbar -->
           <div class="topbar">
             <span class="topbar-title">فیلترهای اعمال شده</span>
 
@@ -33,15 +34,15 @@
             </div>
           </div>
 
-          <!-- Loading -->
-          <div v-if="loading" class="loading">در حال دریافت محصولات...</div>
+          <!-- loading -->
+          <div v-if="pending" class="loading">در حال دریافت محصولات...</div>
 
-          <!-- Empty -->
+          <!-- empty -->
           <div v-else-if="!filteredProducts.length" class="empty">
             محصولی یافت نشد
           </div>
 
-          <!-- Products -->
+          <!-- products -->
           <div v-else class="products">
             <ProductCard
               v-for="item in filteredProducts"
@@ -53,7 +54,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
     <Footer />
   </div>
 </template>
@@ -64,42 +64,35 @@ import Footer from "~/components/Footer.vue";
 import ProductCard from "~/components/ProductCard.vue";
 import SidebarFilter from "~/components/SidebarFilter.vue";
 
-const products = ref([]);
-const loading = ref(false);
+/* دریافت محصولات با SSR و کش */
+const {
+  data: products,
+  pending,
+  error,
+} = await useAsyncData(
+  "products-list",
+  async () => {
+    const res = await $fetch("/api/products");
+
+    return res.map((item, index) => ({
+      id: item.id,
+      title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
+      image: item.image,
+      price: item.price * 100000,
+      category:
+        index % 3 === 0 ? "house" : index % 3 === 1 ? "industry" : "health",
+    }));
+  },
+  {
+    server: true,
+    default: () => [],
+  },
+);
 
 /* فیلترها */
 const search = ref("");
 const sort = ref("");
 const category = ref([]);
-
-/* تبدیل دیتا به مدل درب */
-const transformProducts = (data) => {
-  return data.map((item, index) => ({
-    id: item.id,
-    title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
-    image: item.image,
-    price: item.price * 100000,
-    category:
-      index % 3 === 0 ? "house" : index % 3 === 1 ? "industry" : "health",
-  }));
-};
-
-/* گرفتن دیتا */
-const fetchProducts = async () => {
-  loading.value = true;
-
-  try {
-    const { data } = await useFetch("https://fakestoreapi.com/products");
-
-    if (data.value) {
-      products.value = transformProducts(data.value);
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    loading.value = false;
-  }
-};
 
 /* فیلتر + سرچ + مرتب سازی */
 const filteredProducts = computed(() => {
@@ -144,8 +137,6 @@ const getCategoryName = (cat) => {
       return cat;
   }
 };
-
-onMounted(fetchProducts);
 </script>
 
 <style scoped>
@@ -183,7 +174,7 @@ onMounted(fetchProducts);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: white;
   border-radius: 16px;
   padding: 14px 20px;
   margin-bottom: 24px;
@@ -194,7 +185,7 @@ onMounted(fetchProducts);
   color: #333;
 }
 
-/* tags */
+/* filters */
 
 .filters {
   display: flex;

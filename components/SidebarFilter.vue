@@ -193,13 +193,36 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
-const search = ref("");
+/* props */
+const props = defineProps({
+  search: String,
+  sort: String,
+  category: Array,
+});
+
+/* emit */
+const emit = defineEmits(["update:search", "update:sort", "update:category"]);
+
+/* local models */
+const search = computed({
+  get: () => props.search,
+  set: (val) => emit("update:search", val),
+});
+
+const sort = computed({
+  get: () => props.sort,
+  set: (val) => emit("update:sort", val),
+});
+
+const category = computed({
+  get: () => props.category,
+  set: (val) => emit("update:category", val),
+});
+
+/* other states */
 const availableOnly = ref(false);
-
-const sort = ref("");
-const category = ref(["house"]);
 
 const sortOpen = ref(true);
 const categoryOpen = ref(true);
