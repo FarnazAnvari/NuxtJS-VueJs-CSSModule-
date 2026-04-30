@@ -149,7 +149,7 @@
               class="badge"
               :class="category.includes('house') ? 'pink' : 'dark'"
             >
-              12
+              ۱۲
             </span>
           </label>
 
@@ -166,7 +166,7 @@
               class="badge"
               :class="category.includes('health') ? 'pink' : 'dark'"
             >
-              23
+              ۲۳
             </span>
           </label>
 
@@ -183,7 +183,7 @@
               class="badge"
               :class="category.includes('industry') ? 'pink' : 'dark'"
             >
-              4
+              ۴
             </span>
           </label>
         </div>
@@ -200,10 +200,16 @@ const props = defineProps({
   search: String,
   sort: String,
   category: Array,
+  availableOnly: Boolean,
 });
 
 /* emit */
-const emit = defineEmits(["update:search", "update:sort", "update:category"]);
+const emit = defineEmits([
+  "update:search",
+  "update:sort",
+  "update:category",
+  "update:availableOnly",
+]);
 
 /* local models */
 const search = computed({
@@ -221,8 +227,10 @@ const category = computed({
   set: (val) => emit("update:category", val),
 });
 
-/* other states */
-const availableOnly = ref(false);
+const availableOnly = computed({
+  get: () => props.availableOnly,
+  set: (val) => emit("update:availableOnly", val),
+});
 
 const sortOpen = ref(true);
 const categoryOpen = ref(true);
@@ -230,7 +238,7 @@ const categoryOpen = ref(true);
 
 <style scoped>
 .sidebar {
-  width: 260px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;

@@ -6,7 +6,7 @@
 
         <div class="col">
           <h3>دسترسی سریع</h3>
-          <a class="active" href="#">درباره ما</a>
+          <a href="#">درباره ما</a>
           <a href="#">بلاگ</a>
           <a href="#">تماس با ما</a>
           <a href="#">خدمات پس از فروش</a>
@@ -23,17 +23,23 @@
           <h3>شبکه‌های اجتماعی</h3>
 
           <a href="#" class="social-item">
-            <i class="fab fa-telegram"></i>
+            <div class="icon-wrapper">
+              <font-awesome-icon :icon="['fab', 'telegram']" />
+            </div>
             <span>تلگرام</span>
           </a>
 
           <a href="#" class="social-item">
-            <i class="fab fa-instagram"></i>
+            <div class="icon-wrapper">
+              <font-awesome-icon :icon="['fab', 'instagram']" />
+            </div>
             <span>اینستاگرام</span>
           </a>
 
           <a href="#" class="social-item">
-            <i class="fab fa-linkedin-in"></i>
+            <div class="icon-wrapper">
+              <font-awesome-icon :icon="['fab', 'linkedin']" />
+            </div>
             <span>لینکدین</span>
           </a>
         </div>
@@ -50,11 +56,11 @@
         </p>
 
         <div class="socials">
-          <a><i class="fab fa-linkedin-in"></i></a>
-          <a><i class="fab fa-youtube"></i></a>
-          <a><i class="fab fa-twitter"></i></a>
-          <a><i class="fab fa-instagram"></i></a>
-          <a><i class="fab fa-telegram"></i></a>
+          <a><font-awesome-icon :icon="['fab', 'linkedin']" /></a>
+          <a><font-awesome-icon :icon="['fab', 'youtube']" /></a>
+          <a><font-awesome-icon :icon="['fab', 'twitter']" /></a>
+          <a><font-awesome-icon :icon="['fab', 'instagram']" /></a>
+          <a><font-awesome-icon :icon="['fab', 'telegram']" /></a>
         </div>
       </div>
 
@@ -67,7 +73,7 @@
 </template>
 
 <style scoped>
-/* container استاندارد */
+/* container */
 
 .container {
   max-width: 1200px;
@@ -84,15 +90,14 @@
   padding: 72px 0 64px;
   direction: rtl;
   border-top: 1px solid #e5e7eb;
-  border-radius: 10px;
 }
 
-/* smart grid */
+/* grid */
 
 .footer-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(160px, 220px));
-  gap: 56px;
+  grid-template-columns: minmax(260px, 1.4fr) repeat(3, 1fr);
+  gap: 80px;
   align-items: start;
 }
 
@@ -145,7 +150,7 @@
   gap: 12px;
 }
 
-.social-item i {
+.icon-wrapper {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -153,12 +158,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: 0.25s;
   font-size: 16px;
   color: #4b5563;
-  transition: 0.25s;
 }
 
-.social-item:hover i {
+.social-item:hover .icon-wrapper {
   background: #ff2e63;
   color: white;
   transform: scale(1.05);
@@ -172,14 +177,23 @@
   background: #f6f6f6;
   padding: 36px 0;
   direction: rtl;
-  border-radius: 10px;
 }
+
+/* wrapper */
 
 .bottom-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* center text */
+
+.center {
+  text-align: center;
+  flex: 1;
 }
 
 /* certificates */
@@ -187,7 +201,6 @@
 .certificates {
   display: flex;
   gap: 14px;
-  margin-left: 200px;
 }
 
 .certificates img {
@@ -198,13 +211,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-/* center */
-
-.center {
-  text-align: center;
-  flex: 1;
-  margin-right: 230px;
-}
+/* copyright */
 
 .copyright {
   font-size: 13px;
@@ -213,7 +220,7 @@
   line-height: 1.9;
 }
 
-/* social icons */
+/* socials */
 
 .socials {
   display: flex;
@@ -230,7 +237,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 15px;
+  font-size: 17px;
   transition: 0.25s;
 }
 
@@ -239,10 +246,21 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* ================= */
-/* Tablet */
-/* ================= */
+/* فقط دسکتاپ */
+@media (min-width: 1024px) {
+  .footer-top .container {
+    padding-right: 100px;
+    padding-left: 24px;
+  }
+}
 
+@media (min-width: 1024px) {
+  .certificates {
+    transform: translateX(100px);
+  }
+}
+
+/* Tablet */
 @media (max-width: 1024px) {
   .footer-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -252,10 +270,12 @@
   .support {
     grid-column: 1/-1;
     text-align: center;
+    padding-top: 0;
   }
 
   .bottom-wrapper {
     flex-direction: column;
+    text-align: center;
   }
 
   .certificates {
@@ -263,22 +283,23 @@
   }
 }
 
-/* ================= */
 /* Mobile */
-/* ================= */
-
 @media (max-width: 640px) {
-  .footer-top {
-    padding: 56px 0;
+  .container {
+    padding: 0 120px;
   }
 
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 32px;
+    justify-items: center;
   }
 
   .col {
     align-items: center;
+    text-align: center;
+  }
+  .support {
     text-align: center;
   }
 

@@ -2,54 +2,104 @@
   <div class="page">
     <Header />
 
-    <div class="container">
-      <!-- breadcrumb -->
-      <div class="breadcrumb">
-        <NuxtLink to="/">صفحه اصلی</NuxtLink>
-        <span>›</span>
-        <NuxtLink to="/">لیست محصولات</NuxtLink>
-        <span>›</span>
-        <span class="current">{{ product?.title }}</span>
-      </div>
+    <!-- breadcrumb -->
+    <div class="breadcrumb">
+      <NuxtLink to="/" class="home-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.8"
+            d="M3 10.5L12 3l9 7.5M5 9.5V21h5v-6h4v6h5V9.5"
+          />
+        </svg>
+      </NuxtLink>
 
-      <div v-if="product" class="layout">
-        <!-- product preview -->
-        <div class="product-preview">
-          <ProductCard :product="product" />
+      <span class="sep">›</span>
+
+      <NuxtLink to="/">لیست محصولات</NuxtLink>
+      <span class="sep">›</span>
+
+      <span class="current">{{ product?.title }}</span>
+    </div>
+
+    <div class="container">
+      <!-- loading -->
+      <div v-if="pending" class="loading">در حال دریافت اطلاعات محصول...</div>
+
+      <!-- error -->
+      <div v-else-if="error" class="error">خطا در دریافت محصول</div>
+
+      <!-- content -->
+      <div v-else class="content">
+        <!-- image card -->
+        <div class="image-card">
+          <h1 class="title">{{ product.title }}</h1>
+
+          <div class="image-wrapper">
+            <img :src="product.image" @click="openZoom" />
+
+            <div class="zoom-icon" @click="openZoom">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#333"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.5" y2="16.5"></line>
+              </svg>
+            </div>
+          </div>
         </div>
 
-        <!-- technical specs -->
-        <div class="specs">
+        <div v-if="showZoom" class="zoom-modal" @click="closeZoom">
+          <img :src="product.image" class="zoomed-image" />
+        </div>
+
+        <!-- specs -->
+        <div class="specs-card">
           <h2 class="specs-title">مشخصات فنی</h2>
 
-          <div class="spec-item">
-            <span class="label">ضخامت</span>
-            <span class="value">۲۸ میلی‌متر</span>
-          </div>
+          <div class="specs-table">
+            <div class="row">
+              <div class="label">قیمت</div>
+              <div class="value">{{ formatPrice(product.price) }} تومان</div>
+            </div>
 
-          <div class="spec-item">
-            <span class="label">دسته بندی</span>
-            <span class="value">{{ categoryName }}</span>
-          </div>
+            <div class="row">
+              <div class="label">توضیحات</div>
+              <div class="value">
+                {{ product.description }}
+              </div>
+            </div>
 
-          <div class="spec-item">
-            <span class="label">رده</span>
-            <span class="value">۲</span>
-          </div>
+            <div class="row">
+              <div class="label">دسته بندی</div>
+              <div class="value">{{ product.type }}</div>
+            </div>
 
-          <div class="spec-item">
-            <span class="label">تعداد</span>
-            <span class="value">۵</span>
-          </div>
+            <div class="row">
+              <div class="label">رتبه</div>
+              <div class="value">{{ product.rating }}</div>
+            </div>
 
-          <div class="spec-item description">
-            <span class="label">توضیحات</span>
-
-            <span class="value">
-              اپراتورهای شیشه‌ای مقاوم برای سیستم‌های درب اتوماتیک کشویی تک لنگه
-              و دو لنگه. مناسب برای مراکز درمانی، ساختمان‌های اداری، مراکز تجاری
-              و محیط‌های صنعتی.
-            </span>
+            <div class="row">
+              <div class="label">تعداد</div>
+              <div class="value">{{ product.count }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -62,145 +112,313 @@
 <script setup>
 import Header from "~/components/Header.vue";
 import Footer from "~/components/Footer.vue";
-import ProductCard from "~/components/ProductCard.vue";
 
 const route = useRoute();
+const id = route.params.id;
 
-const { data: product } = await useAsyncData("product-detail", async () => {
-  const res = await $fetch("/api/products");
+const {
+  data: product,
+  pending,
+  error,
+} = await useAsyncData("product-" + id, async () => {
+  const products = await $fetch("/api/products");
 
-  const list = res.map((item, index) => ({
-    id: item.id,
-    title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
-    image: item.image,
-    price: item.price * 100000,
-    category:
-      index % 3 === 0 ? "house" : index % 3 === 1 ? "industry" : "health",
-  }));
+  const found = products.find((p) => p.id == id);
 
-  return list.find((p) => p.id == route.params.id);
-});
-
-const categoryName = computed(() => {
-  if (!product.value) return "";
-
-  switch (product.value.category) {
-    case "house":
-      return "مسکن و ساختمان";
-    case "industry":
-      return "صنعتی و کارخانه";
-    case "health":
-      return "بهداشت و درمان";
-    default:
-      return "";
+  if (!found) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Product not found",
+    });
   }
+
+  return {
+    ...found,
+    price: found.price * 100000,
+  };
 });
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat("fa-IR").format(price);
+};
+
+const showZoom = ref(false);
+
+const openZoom = () => {
+  showZoom.value = true;
+};
+
+const closeZoom = () => {
+  showZoom.value = false;
+};
 </script>
 
 <style scoped>
 .page {
-  background: #f5f6fa;
+  background: #f1f3f8;
   min-height: 100vh;
-}
-
-/* container */
-
-.container {
-  max-width: 1280px;
-  margin: auto;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* breadcrumb */
 
 .breadcrumb {
-  display: flex;
-  gap: 10px;
+  width: 95%;
+  max-width: 1500px;
+  margin: auto;
+  padding: 16px 10px;
   font-size: 14px;
-  color: #777;
-  margin-bottom: 20px;
+  color: #7b808a;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  direction: rtl;
 }
 
 .breadcrumb a {
   text-decoration: none;
-  color: #666;
+  color: #7b8190;
+}
+
+.sep {
+  color: #b7bcc8;
 }
 
 .current {
-  color: #111;
-  font-weight: 500;
+  color: #3d5a80;
+}
+
+.home-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* container */
+
+.container {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 20px 24px;
 }
 
 /* layout */
 
-.layout {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
-  align-items: start;
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
 }
 
-/* preview */
+/* image card */
 
-.product-preview {
-  position: sticky;
-  top: 20px;
+.image-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+}
+
+.title {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #2e2e2e;
+}
+
+/* image */
+
+.image-wrapper {
+  position: relative;
+  background: #eef1f6;
+  border-radius: 14px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 350px;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* zoom */
+
+.zoom-icon {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.zoom-modal {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+}
+
+.zoomed-image {
+  max-width: 80%;
+  max-height: 80%;
+
+  border-radius: 12px;
+  background: white;
+  padding: 20px;
 }
 
 /* specs */
 
-.specs {
-  background: white;
+.specs-card {
+  background: #fff;
   border-radius: 20px;
   padding: 24px;
-  direction: rtl;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .specs-title {
   font-size: 18px;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 18px;
+  color: #2f3a4b;
 }
 
-.spec-item {
+/* specs table */
+
+.specs-table {
   display: flex;
-  justify-content: space-between;
-  padding: 14px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.spec-item:last-child {
-  border-bottom: none;
+.row {
+  display: grid;
+  grid-template-columns: minmax(120px, 220px) 1fr;
+
+  direction: rtl;
+
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .label {
-  color: #888;
+  background: #eef1f6;
+  padding: 14px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
 }
 
 .value {
-  color: #333;
-  max-width: 70%;
-  text-align: left;
+  background: #f6f8fc;
+  padding: 14px;
+  text-align: right;
+  font-size: 14px;
+  color: #2e2e2e;
 }
 
-.description {
-  align-items: flex-start;
-}
+/* states */
 
-.description .value {
-  line-height: 1.9;
+.loading,
+.error {
+  text-align: center;
+  padding: 60px;
+  color: #666;
 }
 
 /* responsive */
 
-@media (max-width: 1024px) {
-  .layout {
-    grid-template-columns: 1fr;
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
   }
 
-  .product-preview {
-    position: relative;
+  .label,
+  .value {
+    width: 100% !important;
+    text-align: right;
+  }
+  .container {
+    padding: 10px 14px !important;
+  }
+}
+/* ================== FIX OVERFLOW & ALIGNMENT ================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* fix card overflowing */
+.image-card,
+.specs-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px 16px;
+  }
+
+  .image-card,
+  .specs-card {
+    padding: 16px;
+  }
+
+  .image-wrapper {
+    height: 300px;
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: auto;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .label,
+  .value {
+    width: 100%;
+    text-align: right;
   }
 }
 </style>

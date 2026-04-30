@@ -10,6 +10,7 @@
             v-model:search="search"
             v-model:sort="sort"
             v-model:category="category"
+            v-model:availableOnly="availableOnly"
           />
         </aside>
 
@@ -30,6 +31,14 @@
                 @click="removeCategory(cat)"
               >
                 {{ getCategoryName(cat) }} ✕
+              </span>
+
+              <span
+                v-if="availableOnly"
+                class="tag"
+                @click="availableOnly = false"
+              >
+                درب های موجود ✕
               </span>
             </div>
           </div>
@@ -64,7 +73,7 @@ import Footer from "~/components/Footer.vue";
 import ProductCard from "~/components/ProductCard.vue";
 import SidebarFilter from "~/components/SidebarFilter.vue";
 
-/* دریافت محصولات با SSR و کش */
+/* دریافت محصولات */
 const {
   data: products,
   pending,
@@ -79,8 +88,10 @@ const {
       title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
       image: item.image,
       price: item.price * 100000,
-      category:
-        index % 3 === 0 ? "house" : index % 3 === 1 ? "industry" : "health",
+      category: item.category,
+      available: item.available,
+      rating: item.rating,
+      count: item.count,
     }));
   },
   {
@@ -93,27 +104,44 @@ const {
 const search = ref("");
 const sort = ref("");
 const category = ref([]);
+const availableOnly = ref(false);
 
 /* فیلتر + سرچ + مرتب سازی */
 const filteredProducts = computed(() => {
   let result = [...products.value];
 
+  /* فقط موجود */
+  if (availableOnly.value) {
+    result = result.filter((p) => p.available);
+  }
+
+  /* سرچ */
   if (search.value) {
     result = result.filter((p) =>
       p.title.toLowerCase().includes(search.value.toLowerCase()),
     );
   }
 
+  /* دسته بندی */
   if (category.value.length) {
     result = result.filter((p) => category.value.includes(p.category));
   }
 
+  /* مرتب سازی */
   if (sort.value === "low") {
-    result.sort((a, b) => a.price - b.price);
+    result.sort((a, b) => a.count - b.count);
   }
 
   if (sort.value === "high") {
-    result.sort((a, b) => b.price - a.price);
+    result.sort((a, b) => b.count - a.count);
+  }
+
+  if (sort.value === "rankHigh") {
+    result.sort((a, b) => b.rating - a.rating);
+  }
+
+  if (sort.value === "rankLow") {
+    result.sort((a, b) => a.rating - b.rating);
   }
 
   return result;
@@ -143,17 +171,20 @@ const getCategoryName = (cat) => {
 .page {
   background: #f5f6fa;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: auto;
   padding: 24px;
+  flex: 1;
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 24px;
 }
 
@@ -166,6 +197,8 @@ const getCategoryName = (cat) => {
 .content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* topbar */
@@ -251,6 +284,12 @@ const getCategoryName = (cat) => {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: static !important;
   }
 }
 </style>

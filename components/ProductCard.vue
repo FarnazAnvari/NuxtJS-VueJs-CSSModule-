@@ -1,59 +1,105 @@
 <template>
-  <div class="card">
+  <NuxtLink :to="`/products/${product.id}`" class="card">
+    <!-- category badge -->
+    <div class="badge">
+      {{ categoryName }}
+    </div>
+
+    <!-- image -->
     <div class="image-wrapper">
       <img :src="product.image" class="image" />
     </div>
 
-    <div class="card-body">
+    <!-- body -->
+    <div class="body">
       <h3 class="title">
         {{ product.title }}
       </h3>
 
-      <button class="btn">مشاهده جزئیات</button>
+      <p class="price">{{ formatPrice(product.price) }} تومان</p>
+
+      <div class="btn">مشاهده جزئیات</div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   product: Object,
 });
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat("fa-IR").format(price);
+};
+
+const categoryMap = {
+  house: "مسکن و ساختمان",
+  industry: "صنعتی و کارخانه",
+  health: "بهداشت و درمان",
+};
+
+const categoryName = categoryMap[props.product.category] || "";
 </script>
 
 <style scoped>
-/* کارت */
 .card {
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  transition: 0.3s ease;
+  position: relative;
   display: flex;
   flex-direction: column;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 18px;
+
+  text-decoration: none;
+  color: inherit;
+
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  min-width: 0;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
 }
 
-/* تصویر */
+/* badge */
+
+.badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #f2f4ff;
+  color: #5563ff;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 10px;
+}
+
+/* image */
+
 .image-wrapper {
-  background: #f8f9fc;
-  padding: 20px;
+  height: 170px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
 }
 
 .image {
-  height: 160px;
+  max-height: 160px;
   object-fit: contain;
+  transition: transform 0.35s ease;
 }
 
-/* بدنه کارت */
-.card-body {
-  padding: 16px;
+.card:hover .image {
+  transform: scale(1.08);
+}
+
+/* body */
+
+.body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -61,65 +107,52 @@ defineProps({
 
 .title {
   font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 16px;
+  line-height: 1.8;
   color: #333;
+  margin-bottom: 10px;
 
-  /* دو خطی شدن متن */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.6;
 }
 
-/* دکمه */
+/* price */
+
+.price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111010;
+  margin-bottom: 14px;
+}
+
+/* button */
+
 .btn {
   margin-top: auto;
   border: 1px solid #ff2c6d;
   color: #ff2c6d;
-  padding: 10px;
+  text-align: center;
+  padding: 9px;
   border-radius: 12px;
-  background: transparent;
-  cursor: pointer;
-  transition: 0.25s ease;
   font-size: 13px;
+  transition: all 0.25s ease;
 }
 
-.btn:hover {
+.card:hover .btn {
   background: #ff2c6d;
-  color: #fff;
+  color: white;
 }
 
-/* ================== */
-/*    Tablet Mode     */
-/* ================== */
+/* responsive */
 
 @media (max-width: 1024px) {
-  .card {
-    border-radius: 16px;
-  }
-
   .image-wrapper {
-    padding: 16px;
+    height: 140px;
   }
 
   .image {
-    height: 130px;
-  }
-
-  .card-body {
-    padding: 12px;
-  }
-
-  .title {
-    font-size: 13px;
-    margin-bottom: 12px;
-  }
-
-  .btn {
-    padding: 8px;
-    font-size: 12px;
+    max-height: 130px;
   }
 }
 </style>
