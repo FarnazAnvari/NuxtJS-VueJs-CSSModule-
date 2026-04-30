@@ -1,0 +1,19 @@
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  direction: rtl;
+
+  /* این ۳ خط کل هدر رو وسط صفحه می‌کشه */
+  max-width: 1200px; /* عرض دلخواه، مثلاً 1200px */
+  margin: 0 auto; /* وسط‌چین کردن کل container */
+  padding: 0 24px; /* کمی فاصله از کناره‌ها */
+}
