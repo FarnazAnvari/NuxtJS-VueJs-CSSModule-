@@ -1,4 +1,3 @@
-
 export const useProducts = () => {
   const products = ref([]);
   const loading = ref(false);

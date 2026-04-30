@@ -15,19 +15,31 @@
         <main class="content">
           <!-- Topbar -->
           <div class="topbar">
-            <!-- این بخش سمت راست می‌ماند -->
             <span class="topbar-title">فیلترهای اعمال شده</span>
 
-            <!-- این بخش به سمت چپ رانده می‌شود -->
             <div class="filters">
-              
-              <span class="tag">تعداد ✕</span>
-              <span class="tag">دو لنگه ✕</span>
+              <span v-if="search" class="tag" @click="search = ''">
+                {{ search }} ✕
+              </span>
+
+              <span
+                v-for="cat in category"
+                :key="cat"
+                class="tag"
+                @click="removeCategory(cat)"
+              >
+                {{ getCategoryName(cat) }} ✕
+              </span>
             </div>
           </div>
 
           <!-- Loading -->
           <div v-if="loading" class="loading">در حال دریافت محصولات...</div>
+
+          <!-- Empty -->
+          <div v-else-if="!filteredProducts.length" class="empty">
+            محصولی یافت نشد
+          </div>
 
           <!-- Products -->
           <div v-else class="products">
@@ -60,13 +72,28 @@ const search = ref("");
 const sort = ref("");
 const category = ref([]);
 
+/* تبدیل دیتا به مدل درب */
+const transformProducts = (data) => {
+  return data.map((item, index) => ({
+    id: item.id,
+    title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
+    image: item.image,
+    price: item.price * 100000,
+    category:
+      index % 3 === 0 ? "house" : index % 3 === 1 ? "industry" : "health",
+  }));
+};
+
 /* گرفتن دیتا */
 const fetchProducts = async () => {
   loading.value = true;
 
   try {
     const { data } = await useFetch("https://fakestoreapi.com/products");
-    products.value = data.value || [];
+
+    if (data.value) {
+      products.value = transformProducts(data.value);
+    }
   } catch (e) {
     console.error(e);
   } finally {
@@ -88,78 +115,90 @@ const filteredProducts = computed(() => {
     result = result.filter((p) => category.value.includes(p.category));
   }
 
-  if (sort.value === "cheap") {
+  if (sort.value === "low") {
     result.sort((a, b) => a.price - b.price);
   }
 
-  if (sort.value === "expensive") {
+  if (sort.value === "high") {
     result.sort((a, b) => b.price - a.price);
   }
 
   return result;
 });
 
+/* حذف دسته */
+const removeCategory = (cat) => {
+  category.value = category.value.filter((c) => c !== cat);
+};
+
+/* نام دسته */
+const getCategoryName = (cat) => {
+  switch (cat) {
+    case "house":
+      return "مسکن و ساختمان";
+    case "industry":
+      return "صنعتی و کارخانه";
+    case "health":
+      return "بهداشت و درمان";
+    default:
+      return cat;
+  }
+};
+
 onMounted(fetchProducts);
 </script>
 
 <style scoped>
-/* صفحه */
 .page {
   background: #f5f6fa;
   min-height: 100vh;
 }
 
-/* container */
 .container {
   max-width: 1280px;
   margin: auto;
   padding: 24px;
 }
 
-/* layout */
 .layout {
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 24px;
 }
 
-/* sidebar */
 .sidebar {
   position: sticky;
   top: 20px;
   height: fit-content;
 }
 
-/* content */
 .content {
   display: flex;
   flex-direction: column;
 }
 
 /* topbar */
+
 .topbar {
   display: flex;
-  justify-content: space-between; /* ایجاد فاصله حداکثری بین دو بخش */
+  justify-content: space-between;
   align-items: center;
-  width: 100%; /* اشغال تمام عرض ستون محصولات */
   background: #fff;
   border-radius: 16px;
   padding: 14px 20px;
   margin-bottom: 24px;
-  box-sizing: border-box; /* برای اینکه padding باعث بیرون زدگی نشود */
 }
 
 .topbar-title {
-  font-weight: 500;
-  color: #333;
   font-size: 14px;
+  color: #333;
 }
 
-/* filter tags */
+/* tags */
+
 .filters {
   display: flex;
   gap: 10px;
-  flex-direction: row-reverse; /* اگر می‌خواهید ترتیب ضربدرها و متن تگ‌ها در چپ‌چین درست باشد */
 }
 
 .tag {
@@ -169,9 +208,6 @@ onMounted(fetchProducts);
   border-radius: 20px;
   font-size: 12px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
   transition: 0.2s;
 }
 
@@ -180,51 +216,40 @@ onMounted(fetchProducts);
   color: white;
 }
 
-/* products grid */
+/* products */
+
 .products {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-/* loading */
-.loading {
+/* states */
+
+.loading,
+.empty {
   text-align: center;
   padding: 60px;
   color: #666;
 }
 
-/* ====================== */
-/*        Tablet          */
-/* ====================== */
+/* tablet */
 
 @media (max-width: 1024px) {
-  .container {
-    padding: 16px;
-  }
-
   .layout {
     grid-template-columns: 220px 1fr;
-    gap: 18px;
   }
 
   .products {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* ====================== */
-/*        Mobile          */
-/* ====================== */
+/* mobile */
 
 @media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: static;
   }
 
   .products {
