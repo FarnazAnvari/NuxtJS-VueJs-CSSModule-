@@ -1,6 +1,15 @@
 import { library, config } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 
+import {
+  faHouse,
+  faIndustry,
+  faHospital,
+  faMagnifyingGlass,
+  faCheckCircle,
+  faTag,
+} from "@fortawesome/free-solid-svg-icons";
 import {
   faList,
   faComments,
@@ -18,6 +27,17 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 config.autoAddCss = false;
+
+library.add(fas);
+
+library.add(
+  faHouse,
+  faIndustry,
+  faHospital,
+  faMagnifyingGlass,
+  faCheckCircle,
+  faTag,
+);
 
 library.add(
   faList,

@@ -66,8 +66,8 @@ export default defineEventHandler(() => {
       description: "درب داخلی ساده و اقتصادی مناسب اتاق خواب و فضاهای داخلی.",
       type: "اتاقی",
       rating: 4.0,
-      count: 18,
-      available: true,
+      count: 0,
+      available: false,
     },
     {
       id: 15,
@@ -202,8 +202,8 @@ export default defineEventHandler(() => {
       description: "درب با پوشش ضد باکتری مناسب بیمارستان‌ها و مراکز درمانی.",
       type: "بیمارستانی",
       rating: 4.7,
-      count: 6,
-      available: true,
+      count: 0,
+      available: false,
     },
     {
       id: 9,

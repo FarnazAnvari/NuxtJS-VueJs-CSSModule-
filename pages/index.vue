@@ -20,25 +20,34 @@
             <span class="topbar-title">فیلترهای اعمال شده</span>
 
             <div class="filters">
+              <!-- سرچ -->
               <span v-if="search" class="tag" @click="search = ''">
-                {{ search }} ✕
+                <font-awesome-icon icon="magnifying-glass" />
+                <span>{{ search }}</span>
+                <span class="tag-close">✕</span>
               </span>
 
+              <!-- دسته‌های انتخاب‌شده -->
               <span
                 v-for="cat in category"
                 :key="cat"
                 class="tag"
                 @click="removeCategory(cat)"
               >
-                {{ getCategoryName(cat) }} ✕
+                <font-awesome-icon :icon="getCategoryIcon(cat)" />
+                <span>{{ getCategoryName(cat) }}</span>
+                <span class="tag-close">✕</span>
               </span>
 
+              <!-- فقط موجود -->
               <span
                 v-if="availableOnly"
                 class="tag"
                 @click="availableOnly = false"
               >
-                درب های موجود ✕
+                <font-awesome-icon icon="check-circle" />
+                <span>درب های موجود</span>
+                <span class="tag-close">✕</span>
               </span>
             </div>
           </div>
@@ -74,18 +83,16 @@ import ProductCard from "~/components/ProductCard.vue";
 import SidebarFilter from "~/components/SidebarFilter.vue";
 
 /* دریافت محصولات */
-const {
-  data: products,
-  pending,
-  error,
-} = await useAsyncData(
+const { data: products, pending } = await useAsyncData(
   "products-list",
   async () => {
     const res = await $fetch("/api/products");
 
     return res.map((item, index) => ({
       id: item.id,
-      title: `درب ${index % 2 === 0 ? "دو لنگه" : "تک لنگه"} مدل ${item.title.slice(0, 12)}`,
+      title: `درب ${
+        index % 2 === 0 ? "دو لنگه" : "تک لنگه"
+      } مدل ${item.title.slice(0, 12)}`,
       image: item.image,
       price: item.price * 100000,
       category: item.category,
@@ -94,10 +101,7 @@ const {
       count: item.count,
     }));
   },
-  {
-    server: true,
-    default: () => [],
-  },
+  { server: true, default: () => [] },
 );
 
 /* فیلترها */
@@ -110,39 +114,24 @@ const availableOnly = ref(false);
 const filteredProducts = computed(() => {
   let result = [...products.value];
 
-  /* فقط موجود */
   if (availableOnly.value) {
     result = result.filter((p) => p.available);
   }
 
-  /* سرچ */
   if (search.value) {
     result = result.filter((p) =>
       p.title.toLowerCase().includes(search.value.toLowerCase()),
     );
   }
 
-  /* دسته بندی */
   if (category.value.length) {
     result = result.filter((p) => category.value.includes(p.category));
   }
 
-  /* مرتب سازی */
-  if (sort.value === "low") {
-    result.sort((a, b) => a.count - b.count);
-  }
-
-  if (sort.value === "high") {
-    result.sort((a, b) => b.count - a.count);
-  }
-
-  if (sort.value === "rankHigh") {
-    result.sort((a, b) => b.rating - a.rating);
-  }
-
-  if (sort.value === "rankLow") {
-    result.sort((a, b) => a.rating - b.rating);
-  }
+  if (sort.value === "low") result.sort((a, b) => a.count - b.count);
+  if (sort.value === "high") result.sort((a, b) => b.count - a.count);
+  if (sort.value === "rankHigh") result.sort((a, b) => b.rating - a.rating);
+  if (sort.value === "rankLow") result.sort((a, b) => a.rating - b.rating);
 
   return result;
 });
@@ -163,6 +152,20 @@ const getCategoryName = (cat) => {
       return "بهداشت و درمان";
     default:
       return cat;
+  }
+};
+
+/* آیکون‌ها */
+const getCategoryIcon = (cat) => {
+  switch (cat) {
+    case "house":
+      return "house";
+    case "industry":
+      return "industry";
+    case "health":
+      return "hospital";
+    default:
+      return "tag";
   }
 };
 </script>
@@ -202,7 +205,6 @@ const getCategoryName = (cat) => {
 }
 
 /* topbar */
-
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -219,7 +221,6 @@ const getCategoryName = (cat) => {
 }
 
 /* filters */
-
 .filters {
   display: flex;
   gap: 10px;
@@ -233,6 +234,9 @@ const getCategoryName = (cat) => {
   font-size: 12px;
   cursor: pointer;
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .tag:hover {
@@ -240,8 +244,19 @@ const getCategoryName = (cat) => {
   color: white;
 }
 
-/* products */
+.tag :deep(svg) {
+  width: 14px;
+  height: 14px;
+}
 
+/* ضربدر چپ */
+.tag-close {
+  margin-right: auto;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* products */
 .products {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -249,7 +264,6 @@ const getCategoryName = (cat) => {
 }
 
 /* states */
-
 .loading,
 .empty {
   text-align: center;
@@ -257,37 +271,27 @@ const getCategoryName = (cat) => {
   color: #666;
 }
 
-/* tablet */
-
 @media (max-width: 1024px) {
   .layout {
     grid-template-columns: 220px 1fr;
   }
-
   .products {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* mobile */
-
 @media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
   }
-
   .products {
     grid-template-columns: 1fr;
   }
-
   .topbar {
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
   }
-}
-
-@media (max-width: 768px) {
   .sidebar {
     position: static !important;
   }
