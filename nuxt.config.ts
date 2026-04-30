@@ -3,10 +3,7 @@ import { defineNuxtConfig } from "nuxt/config";
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  css: [
-    "~/assets/css/main.css",
-    "@fortawesome/fontawesome-svg-core/styles.css",
-  ],
+  css: ["~/assets/css/main.css"],
 
   app: {
     head: {

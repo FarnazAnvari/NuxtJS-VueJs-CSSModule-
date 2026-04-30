@@ -27,6 +27,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 config.autoAddCss = false;
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
 library.add(fas);
 
