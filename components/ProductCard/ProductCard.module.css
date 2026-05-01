@@ -1,47 +1,3 @@
-<template>
-  <NuxtLink :to="`/products/${product.id}`" class="card">
-    <!-- category badge -->
-    <div class="badge">
-      {{ categoryName }}
-    </div>
-
-    <!-- image -->
-    <div class="image-wrapper">
-      <img :src="product.image" class="image" />
-    </div>
-
-    <!-- body -->
-    <div class="body">
-      <h3 class="title">
-        {{ product.title }}
-      </h3>
-
-      <p class="price">{{ formatPrice(product.price) }} تومان</p>
-
-      <div class="btn">مشاهده جزئیات</div>
-    </div>
-  </NuxtLink>
-</template>
-
-<script setup>
-const props = defineProps({
-  product: Object,
-});
-
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("fa-IR").format(price);
-};
-
-const categoryMap = {
-  house: "مسکن و ساختمان",
-  industry: "صنعتی و کارخانه",
-  health: "بهداشت و درمان",
-};
-
-const categoryName = categoryMap[props.product.category] || "";
-</script>
-
-<style scoped>
 .card {
   position: relative;
   display: flex;
@@ -65,7 +21,6 @@ const categoryName = categoryMap[props.product.category] || "";
 }
 
 /* badge */
-
 .badge {
   position: absolute;
   top: 14px;
@@ -77,8 +32,7 @@ const categoryName = categoryMap[props.product.category] || "";
   border-radius: 10px;
 }
 
-/* image */
-
+/* image wrapper */
 .image-wrapper {
   height: 170px;
   display: flex;
@@ -93,12 +47,12 @@ const categoryName = categoryMap[props.product.category] || "";
   transition: transform 0.35s ease;
 }
 
+/* hover zoom (به صورت ماژولار درست کار می‌کند) */
 .card:hover .image {
   transform: scale(1.08);
 }
 
 /* body */
-
 .body {
   display: flex;
   flex-direction: column;
@@ -118,7 +72,6 @@ const categoryName = categoryMap[props.product.category] || "";
 }
 
 /* price */
-
 .price {
   font-size: 15px;
   font-weight: 600;
@@ -127,7 +80,6 @@ const categoryName = categoryMap[props.product.category] || "";
 }
 
 /* button */
-
 .btn {
   margin-top: auto;
   border: 1px solid #ff2c6d;
@@ -145,7 +97,6 @@ const categoryName = categoryMap[props.product.category] || "";
 }
 
 /* responsive */
-
 @media (max-width: 1024px) {
   .image-wrapper {
     height: 140px;
@@ -155,4 +106,3 @@ const categoryName = categoryMap[props.product.category] || "";
     max-height: 130px;
   }
 }
-</style>

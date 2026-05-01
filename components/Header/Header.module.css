@@ -1,50 +1,3 @@
-<template>
-  <header class="header">
-    <div class="container">
-      <!-- دکمه همبرگری (موبایل) -->
-      <button class="menu-btn" @click="menuOpen = !menuOpen">
-        <font-awesome-icon :icon="['fas', 'bars']" />
-      </button>
-
-      <!-- منو -->
-      <nav class="nav" :class="{ open: menuOpen }">
-        <NuxtLink to="/">
-          <font-awesome-icon :icon="['fas', 'list']" class="icon" />
-          لیست محصولات
-        </NuxtLink>
-
-        <NuxtLink to="#">
-          <font-awesome-icon :icon="['fas', 'comments']" class="icon" />
-          دریافت مشاوره
-        </NuxtLink>
-
-        <NuxtLink to="#">
-          <font-awesome-icon :icon="['fas', 'question-circle']" class="icon" />
-          سوالات متداول
-        </NuxtLink>
-
-        <NuxtLink to="#">
-          <font-awesome-icon :icon="['fas', 'phone']" class="icon" />
-          تماس با ما
-        </NuxtLink>
-      </nav>
-
-      <!-- دکمه تماس -->
-      <button class="contact-btn">
-        تماس
-        <font-awesome-icon :icon="['fas', 'phone']" class="btn-icon" />
-      </button>
-    </div>
-  </header>
-</template>
-
-<script setup>
-import { ref } from "vue";
-
-const menuOpen = ref(false);
-</script>
-
-<style scoped>
 .header {
   background: #fff;
   border-bottom: 1px solid #eee;
@@ -70,7 +23,8 @@ const menuOpen = ref(false);
   gap: 24px;
 }
 
-.nav a {
+/* لینک‌های داخل ناوبری */
+.nav :global(a) {
   text-decoration: none;
   color: #1d1d1d;
   font-size: 14px;
@@ -90,18 +44,16 @@ const menuOpen = ref(false);
 }
 
 /* لینک فعال */
-
-.nav a.active {
+.nav :global(a.active) {
   color: #ff2c6d;
 }
 
-.nav a.active .icon {
+.nav :global(a.active) .icon {
   color: #ff2c6d;
 }
 
 /* خط زیر لینک فعال */
-
-.nav a.active::after {
+.nav :global(a.active)::after {
   content: "";
   position: absolute;
   bottom: -6px;
@@ -110,22 +62,22 @@ const menuOpen = ref(false);
   height: 2px;
   background: #ff2c6d;
 }
-.nav a:hover {
+
+/* hover روی لینک‌ها */
+.nav :global(a:hover) {
   color: #ff2c6d;
 }
 
-.nav a:hover .icon {
+.nav :global(a:hover) .icon {
   color: #ff2c6d;
 }
 
 /* حذف خط برای تماس */
-
-.nav a.no-underline::after {
+.nav :global(a.no-underline)::after {
   display: none;
 }
 
 /* دکمه تماس */
-
 .contact-btn {
   background: #ff2c6d;
   color: white;
@@ -144,7 +96,6 @@ const menuOpen = ref(false);
 }
 
 /* دکمه همبرگری */
-
 .menu-btn {
   display: none;
   background: none;
@@ -154,7 +105,6 @@ const menuOpen = ref(false);
 }
 
 /* موبایل */
-
 @media (max-width: 768px) {
   .menu-btn {
     display: block;
@@ -176,8 +126,8 @@ const menuOpen = ref(false);
     display: none;
   }
 
-  .nav.open {
+  /* حالت باز منو در موبایل */
+  .open {
     display: flex;
   }
 }
-</style>
