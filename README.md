@@ -67,6 +67,7 @@ A modern, high-performance product catalog built with **Nuxt 3** and **Vue.js 3 
 │
 ├── nuxt.config.ts             # Nuxt configuration
 └── package.json
+└── README.md
 ```
 
 # 🛒 Nuxt Shop – Online Product Catalog
